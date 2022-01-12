@@ -1,0 +1,160 @@
+---
+extractor: "pdf.pdfbox"
+
+header:
+  default: 290
+footer:
+  default: 550
+
+maxRowDistance: 2
+
+rootRecordType: invoiceid
+
+recordTypes:
+  invoiceid:
+    label: "invoiceid"
+    valueTypes:
+      - invoiceid
+      - date
+      - description
+      - sumnotax
+      - tax
+      - sumwithtax
+      
+valueTypes:
+  invoiceid:
+    label: "Invoice ID"
+  date:
+    label: "Date"
+  description:
+    label: "Description"
+  sumnotax:
+    label: "Sum, no tax"
+  tax:
+    label: "Tax"
+  sumwithtax:
+    label: "Sum with tax"
+  
+initialState: "INIT"
+  
+states:
+  INIT:
+    include: false
+    transitions:
+      -
+        condition: invoiceid
+        nextState: invoiceid
+      -
+        condition: any
+        nextState: INIT
+        
+  invoiceid:
+    startRecord: true
+    transitions:
+      -
+        condition: any
+        nextState: datesearch
+        
+  datesearch:
+    include: false
+    transitions:
+      -
+        condition: date
+        nextState: date
+      -
+        condition: any
+        nextState: datesearch
+        
+  date:
+    transitions:
+      -
+        condition: any
+        nextState: descriptionsearch
+        
+  descriptionsearch:
+    include: false
+    transitions:
+      -
+        condition: description
+        nextState: description
+      -
+        condition: any
+        nextState: descriptionsearch
+        
+  description:
+    transitions:
+      -
+        condition: description
+        nextState: description
+      -
+        condition: any
+        nextState: sumnotaxsearch
+  
+  sumnotaxsearch:
+    include: false
+    transitions:
+      -
+        condition: sumnotax
+        nextState: sumnotax
+      -
+        condition: any
+        nextState: sumnotaxsearch
+        
+  sumnotax:
+    transitions:
+      -
+        condition: any
+        nextState: taxsearch
+        
+  taxsearch:
+    include: false
+    transitions:
+      -
+        condition: tax
+        nextState: tax
+      -
+        condition: any
+        nextState: taxsearch
+  tax:
+    transitions:
+      -
+        condition: any
+        nextState: sumwithtaxsearch
+        
+  sumwithtaxsearch:
+    include: false
+    transitions:
+      -
+        condition: sumwithtax
+        nextState: sumwithtax
+      -
+        condition: any
+        nextState: sumwithtaxsearch
+        
+  sumwithtax:
+    transitions:
+      -
+        condition: any
+        nextState: INIT
+    
+conditions:
+  invoiceid: 'text =~ /XXY(\\d)(\\d)(\\d)(\\d)(\\d)/'
+  
+  date: 'text =~ /(\\d)(\\d)\.(\\d)(\\d)\.(\\d)(\\d)(\\d)(\\d)/' # and 310 < uly < 320'
+  description: '(50 < ulx < 200) and (410 < uly < 450)'
+  sumnotax:    '(380 < ulx < 400) and (451 < uly < 470)'
+  tax:         '(380 < ulx < 400) and (471 < uly < 480)'
+  sumwithtax:  '(380 < ulx < 400) and (510 < uly < 525)'
+    
+  any: "1 = 1"
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
